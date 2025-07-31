@@ -1,0 +1,186 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[landscape, margin=0.5in]{geometry}
+\usepackage{fontspec}  % For Calibri
+\setmainfont{GiovanniBook}
+
+\usepackage[table]{xcolor} % color support for tables
+\usepackage{booktabs}      % professional-looking tables
+\usepackage{array}  
+\usepackage{hyperref}
+\usepackage{lipsum}
+\pagenumbering{gobble}
+\usepackage{multicol}
+\usepackage{background}
+\usepackage{pgfplotstable} % for reading and displaying tables
+\usepackage{datatool}      % for more advanced data processing
+\usepackage{xstring}       % string processing
+
+%disables subsection indenting
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@startsection}
+  {\@afterindenttrue}
+  {\@afterindentfalse}
+  {}{}
+\makeatother
+
+% for table cell alignment
+\usepackage{array}
+
+
+
+
+
+
+% Load the CSV data (adjust filename and path if needed)
+\DTLloaddb{mydata}{data.csv}
+
+% Fonts and color
+
+\definecolor{verylightblue}{RGB}{230, 245, 255}
+
+\backgroundsetup{
+  scale=1,
+  color=black,
+  opacity=1,
+  angle=0,
+  contents={%
+    \begin{tikzpicture}[remember picture, overlay]
+      \path[shade, top color=white, bottom color=verylightblue]
+        (current page.south west) rectangle (current page.north east);
+    \end{tikzpicture}
+  }
+}
+
+\definecolor{offwhite}{RGB}{245, 245, 245}
+% Set column separation rule width and color
+\setlength{\columnseprule}{2pt}          % thickness of vertical lines
+\def\columnseprulecolor{\color{offwhite}}  % color of vertical lines
+
+
+\title{Dose Limit Cheat-Sheet}
+\author{Esteban Ruiz}
+\date{July 2025}
+
+\begin{document}
+
+\newcommand{\printGroupTable}[1]{%
+\noindent
+  \begin{tabular}{m{4.5cm} m{1.3cm} {0.9cm}} % 3 columns
+    \toprule
+    Effect & Value & Source \\
+    \midrule
+    \DTLforeach*{mydata}{%
+      \Group=Group, \Effect=Effect, \Value=Value, \Source=Source%
+    }{%
+      \ifthenelse{\equal{\Group}{#1}}{%
+        \Effect & \Value & \Source \\
+      }{}%
+    }
+  \end{tabular}%
+}
+
+\newcommand{\printNucTable}[1]{%
+\noindent
+  \begin{tabular}{m{4.5cm} m{1.3cm} {0.9cm}} % 3 columns
+    \toprule
+    Limit & Value & Source \\
+    \midrule
+    \DTLforeach*{mydata}{%
+      \Group=Group, \Regulation=Effect, \Value=Value, \Source=Source%
+    }{%
+      \ifthenelse{\equal{\Group}{#1}}{%
+        \Regulation & \Value & \Source \\
+      }{}%
+    }
+  \end{tabular}%
+}
+
+
+
+\maketitle
+
+\section*{Introduction}
+
+\noindent\rule{\linewidth}{0.4pt} \\
+ 
+ The purpose of this document is to summarize dose limits of major interest in radiation protection, radiation imaging, nuclear medicine, and radiation imaging. The document is a work in progress and is intended to assist in clinical decision making and policy development by a radiation safety officer or medical physicist. All values in this list are derived from relevant published research, regulations, or standards that are widely accepted. These limits should only be used by personnel with an appropriate understanding of their meaning and limitations. Citations are included for all values for ease of reference. Please contact the author at \hyperref[]{esruiz@gatech.edu}. with any suggestions or if any errors are found. This document is being developed with the intention to condense the contents into a "cheat-sheet".
+
+
+\newpage
+
+\raggedcolumns
+\begin{multicols}{3}
+
+\section*{Deterministic Effects}
+
+Deterministic effects will occur consistently above a given threshold. Below is a table of common deterministic effects. Deterministic thresholds are given in units of \textit{Gray} (Gy), which is the SI unit of absorped dose, or Sieverts (Sv), which is the SI unit of effective dose.
+
+\begin{center}
+\subsection*{Tissue Responses}
+\end{center}
+
+\printGroupTable{Det}
+
+\noindent*NCRP 116 Effective Dose to lens, skin, and extremities.
+
+\begin{center}
+\subsection*{Whole Body Exposures}
+\end{center}
+
+\printGroupTable{WBI}
+
+\section*{Stochastic Effects}
+
+According to the \textit{Linear no-threshold model}, stochastic effects occur with a probability which is proportional to the \textit{Total Effective Dose} received. Below is a table of recomended limits from the \textit{National Council on Radiation Protection Report #116.}
+
+\begin{center}
+\subsection*{NCRP 116 Limits}
+\end{center}
+
+\printNucTable{116}
+
+\noindent*Once pregnancy is known.\\
+\noindent**Lifetime Rad Worker Dose is 10mSv * age [years].\\
+
+\begin{center}
+\subsection*{NCRP 116 Risk Estimates}
+
+\printGroupTable{Risk}
+
+\end{center}
+
+
+
+This is an example of an equation, where
+
+$$H_E = D * w_R$$ Where $w_R$ is the radiation weighting factor. Below is a table of the radiation factors. 
+
+\section*{NRC Regulations}
+
+Regulatory limits exist for deterministic and Stochastic responses. These limits sometimes differ from researched values.
+
+\subsection*{NRC}
+
+\printNucTable{NRC}
+
+\section*{Weighting Factors}
+
+
+
+\section*{Tissue Weighting Factors}
+
+
+
+\section*{Sources}
+
+[1] omp.org
+\\
+
+[2] https://remm.hhs.gov/LD50-60.htm
+
+[3] https://www.energy.gov/sites/prod/files/2018/01/f46/doe-ionizing-radiation-dose-ranges-jan-2018.pdf
+
+\end{multicols}
+\end{document}
